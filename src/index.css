@@ -1,0 +1,924 @@
+:root {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #1a1a1a;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+#root {
+  width: 100%;
+  margin: 0 auto;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  transition: background 0.12s ease-out, border-color 0.12s ease-out;
+}
+button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+input[type='range'] {
+  width: 100%;
+}
+
+@keyframes progress-indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(250%);
+  }
+}
+
+.dp-main {
+  max-width: 960px;
+  margin: 0 auto;
+  /* iOS 26 Safari (Liquid Glass) は viewport-fit=cover でコンテンツが画面端まで広がるため、
+     セーフエリア（Dynamic Island / ホームインジケータ / ランドスケープのノッチ）を padding で避ける。
+     非ノッチ機・PC では env() が 0 なので max() が既存値を返し完全に無影響。 */
+  padding: 1.5rem;
+  padding-top: max(1.5rem, env(safe-area-inset-top));
+  padding-right: max(1.5rem, env(safe-area-inset-right));
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  padding-left: max(1.5rem, env(safe-area-inset-left));
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: left;
+}
+/* PC レイアウト時は左 canvas を広く取れるよう max-width を拡張。 */
+@media (min-width: 900px) {
+  .dp-main {
+    max-width: 1280px;
+  }
+}
+
+.dp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.dp-header h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.dp-badges {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  /* ヘッダーが折り返した時（タイトルが 1 行に収まらないモバイル幅）、 バッジ群を 2 行目に右寄せする。
+     1 行に収まる時は space-between と同じく右端に置かれる（タイトル左 / バッジ右）。 */
+  margin-left: auto;
+}
+.dp-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cfd6e0;
+}
+.dp-badge--gpu {
+  background: rgba(80, 200, 120, 0.18);
+  border-color: rgba(80, 200, 120, 0.4);
+}
+.dp-badge--cpu {
+  background: rgba(255, 180, 80, 0.18);
+  border-color: rgba(255, 180, 80, 0.4);
+}
+.dp-github-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cfd6e0;
+  line-height: 0;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.dp-github-link:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+.dp-lang-select,
+.dp-backend-select {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cfd6e0;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  line-height: 1.2;
+  touch-action: manipulation;
+}
+.dp-lang-select:focus-visible,
+.dp-backend-select:focus-visible {
+  outline: 2px solid rgba(120, 170, 255, 0.8);
+  outline-offset: 1px;
+}
+.dp-lang-select option,
+.dp-backend-select option {
+  color: #000;
+}
+
+.dp-error {
+  margin: 0;
+  padding: 0.6rem 0.9rem;
+  background: rgba(255, 80, 80, 0.12);
+  border: 1px solid rgba(255, 80, 80, 0.4);
+  border-radius: 6px;
+  color: #ffb0b0;
+  font-size: 0.9rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.dp-error__message {
+  flex: 1 1 240px;
+  word-break: break-word;
+}
+.dp-error__actions {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.dp-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dp-inferring {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+.dp-inferring__detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.dp-inferring__bar {
+  position: relative;
+  width: 220px;
+  max-width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.dp-inferring__bar-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 0%;
+  background: #6aa9ff;
+  transition: width 0.2s ease-out;
+}
+.dp-inferring__bar-fill--indeterminate {
+  width: 40%;
+  background: linear-gradient(90deg, transparent, #6aa9ff, transparent);
+  animation: progress-indeterminate 1.4s linear infinite;
+  transition: none;
+}
+
+.dp-thumbnail {
+  width: 160px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 6px;
+  background: #000;
+}
+
+.dp-viewer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/*
+ * PC / モバイル横（wide）レイアウト。
+ * - 左 canvas 可変 / 右ペイン 360px 固定
+ * - 右ペインは position: sticky + 内部 overflow で「縦に長くても canvas は不動」
+ * - mobile-landscape も同じレイアウトを適用
+ */
+.dp-viewer--wide {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 1rem;
+  align-items: start;
+}
+.dp-viewer__canvas {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  /* 中央オーバーレイの基準（absolute の親）*/
+  position: relative;
+}
+
+/*
+ * 画像差替時に canvas を残しつつ中央に半透明オーバーレイで進捗を出す。
+ * pointer-events: auto でモード切替・PiP には届かせない（z-index で上位）。
+ */
+.dp-canvas-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  pointer-events: auto;
+  z-index: 2;
+}
+.dp-canvas-overlay__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.9rem 1.2rem;
+  background: rgba(20, 20, 24, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  color: #cfd6e0;
+  min-width: 200px;
+}
+.dp-canvas-overlay__label {
+  font-size: 0.9rem;
+}
+.dp-canvas-overlay__bar {
+  position: relative;
+  width: 180px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.dp-canvas-overlay__bar-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 0%;
+  background: #6aa9ff;
+  transition: width 0.2s ease-out;
+}
+.dp-canvas-overlay__bar-fill--indeterminate {
+  width: 40%;
+  background: linear-gradient(90deg, transparent, #6aa9ff, transparent);
+  animation: progress-indeterminate 1.4s linear infinite;
+  transition: none;
+}
+.dp-canvas-overlay__cancel {
+  font-size: 0.85rem;
+}
+
+/*
+ * 深度マップ PiP。`.dp-viewer__canvas` の **右下**（screen 右下ではない）に absolute 配置。
+ * pointer-events: auto + button 要素で受け、canvas pointermove に届かない。
+ * .dp-canvas-overlay (z-index: 2) が上に被さると PiP は隠れる ＝ 再推論中の操作不可
+ * を視覚的に伝える狙いがあるので z-index: 1 で OK。
+ */
+.dp-depth-pip {
+  position: absolute;
+  right: 0.6rem;
+  bottom: 0.6rem;
+  z-index: 1;
+  padding: 4px;
+  margin: 0;
+  background: rgba(20, 20, 24, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+  cursor: zoom-in;
+  pointer-events: auto;
+  touch-action: manipulation;
+  line-height: 0;
+}
+.dp-depth-pip:hover {
+  border-color: rgba(255, 255, 255, 0.32);
+}
+.dp-depth-pip:focus-visible {
+  outline: 2px solid #6aa9ff;
+  outline-offset: 2px;
+}
+.dp-depth-pip__canvas {
+  display: block;
+  width: 120px;
+  max-width: 30vw;
+  height: auto;
+  border-radius: 3px;
+  image-rendering: auto;
+}
+
+/*
+ * 深度マップ拡大モーダル。
+ * fixed フルスクリーンで canvas / シート / PiP を覆い、背景 dim でフォーカスを集める。
+ * 背景は onClick={onClose}、パネル内は stopPropagation してクリックを吸収する。
+ * z-index: 100 で他 UI の上位に出る。
+ */
+.dp-depth-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 1rem;
+  pointer-events: auto;
+}
+.dp-depth-modal__panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1rem 1rem 0.9rem;
+  max-width: min(720px, 90vw);
+  max-height: 90vh;
+  overflow: auto;
+  background: rgba(20, 20, 24, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  color: #cfd6e0;
+}
+.dp-depth-modal__close {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  padding: 0.25rem 0.5rem;
+  background: transparent;
+  border: none;
+  color: #cfd6e0;
+  font-size: 1.05rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.dp-depth-modal__close:focus-visible {
+  outline: 2px solid #6aa9ff;
+  outline-offset: 2px;
+}
+.dp-depth-modal__caption {
+  font-size: 0.85rem;
+  color: #cfd6e0;
+  padding-right: 1.5rem;
+}
+.dp-depth-modal__canvas {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  image-rendering: auto;
+}
+.dp-depth-modal__legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.dp-depth-modal__legend-bar {
+  width: 100%;
+  height: 10px;
+  border-radius: 3px;
+  background: linear-gradient(
+    90deg,
+    rgb(68, 1, 84),
+    rgb(64, 67, 135),
+    rgb(32, 144, 140),
+    rgb(121, 209, 81),
+    rgb(253, 231, 36)
+  );
+}
+.dp-depth-modal__legend-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #9aa3b2;
+}
+.dp-depth-modal__meta {
+  font-size: 0.75rem;
+  color: #9aa3b2;
+}
+
+/* 設定 UI 常駐の画像セレクタ。全画面 Dropzone より控えめなコンパクト UI。 */
+.dp-image-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+.dp-image-picker__label {
+  font-size: 0.8rem;
+  color: #9aa3b2;
+  letter-spacing: 0.04em;
+}
+.dp-image-picker__samples {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.dp-image-picker__sample {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  padding: 0.3rem 0.4rem;
+}
+.dp-image-picker__sample-thumb {
+  display: block;
+  width: 56px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 3px;
+  background: #000;
+}
+.dp-image-picker__sample-label {
+  white-space: nowrap;
+}
+.dp-image-picker__file-row {
+  display: flex;
+  gap: 0.4rem;
+}
+.dp-image-picker__file {
+  flex: 1 1 auto;
+  font-size: 0.85rem;
+}
+.dp-image-picker__camera {
+  font-size: 0.85rem;
+}
+
+/*
+ * 折り畳み版 ImagePicker。
+ * collapsed 時はセクション自体が薄い 1 行ボタン。expanded 時はヘッダ行に
+ * ラベルと折り畳みボタンを並べる。
+ */
+.dp-image-picker--collapsed {
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+.dp-image-picker__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.35rem 0.6rem 0.35rem 0.4rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: #cfd6e0;
+  cursor: pointer;
+  text-align: left;
+}
+.dp-image-picker__toggle-thumb {
+  display: block;
+  width: 36px;
+  height: 26px;
+  object-fit: cover;
+  border-radius: 3px;
+  background: #000;
+  flex-shrink: 0;
+}
+.dp-image-picker__toggle:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+.dp-image-picker__toggle:focus-visible {
+  outline: 2px solid #6aa9ff;
+  outline-offset: 2px;
+}
+.dp-image-picker__toggle-label {
+  font-size: 0.8rem;
+  color: #9aa3b2;
+  letter-spacing: 0.04em;
+}
+.dp-image-picker__toggle-chevron {
+  font-size: 0.75rem;
+  color: #9aa3b2;
+  line-height: 1;
+  margin-left: auto;
+}
+
+.dp-image-picker__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.dp-image-picker__collapse {
+  background: transparent;
+  border: none;
+  color: #9aa3b2;
+  cursor: pointer;
+  padding: 0.1rem 0.3rem;
+  font-size: 0.85rem;
+  line-height: 1;
+  border-radius: 3px;
+}
+.dp-image-picker__collapse:hover {
+  color: #cfd6e0;
+  background: rgba(255, 255, 255, 0.06);
+}
+.dp-image-picker__collapse:focus-visible {
+  outline: 2px solid #6aa9ff;
+  outline-offset: 2px;
+}
+
+.dp-settings-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.dp-viewer--wide .dp-settings-pane {
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+}
+
+/*
+ * モバイル縦の BottomSheet レイアウト。dp-viewer--sheet の data-sheet-state で
+ * Peek / Half を切替える。
+ *
+ * 不変条件:
+ * - シートは position: fixed で canvas に被せる。canvas の clientHeight は
+ *   `padding-bottom` を sheet state に応じて変えることでスナップ完了時のみ変化させ、
+ *   ResizeObserver の発火を 1 回に抑える
+ * - pointer-events: auto + touch-action 設定で canvas に届かせない
+ * - iOS Safari 対策: svh 主、vh フォールバック
+ */
+/* sheet layout 用の CSS 変数を root レベルに置く（.dp-main からも参照したいので）。
+   Peek / Half 高さ。svh 主、vh フォールバック（iOS アドレスバー伸縮）。 */
+:root {
+  --dp-sheet-peek-h: 12vh;
+  --dp-sheet-half-h: 55vh;
+  /* ヘッダ・section padding を概算で差し引いた余白。 canvas が sheet を越えない max-height 計算に使う */
+  --dp-sheet-chrome-h: 6rem;
+}
+@supports (height: 100svh) {
+  :root {
+    --dp-sheet-peek-h: clamp(76px, 12svh, 112px);
+    --dp-sheet-half-h: 55svh;
+  }
+}
+
+.dp-viewer--sheet {
+  display: block;
+  position: relative;
+}
+/*
+ * sheet レイアウト表示中はページ全体のスクロールを止める。
+ * Peek を縦スワイプし損ねたぶんが背景ページスクロールに化けるのを根本から防ぐ
+ * （canvas は既に touch-action: none、 Peek の各リーフも none なので、 残りの取りこぼし
+ *  ＝ヘッダ/section余白/ページはみ出しぶんをここで封じる）。
+ * 副作用: フッター（情報表示）は sheet 表示中スクロール到達不能になる（許容）。
+ */
+html:has(.dp-viewer--sheet),
+body:has(.dp-viewer--sheet) {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+/* sheet layout が表示されている時、 footer が sheet 下に隠れないよう .dp-main に
+   bottom padding を入れて Peek 分のスクロール余白を確保する。 sheet 自体は
+   position: fixed なので、 padding は文書フローの footer 位置調整のみに作用する。 */
+.dp-main:has(.dp-viewer--sheet) {
+  padding-bottom: calc(var(--dp-sheet-peek-h) + 1rem);
+}
+/*
+ * canvas は .dp-viewer__canvas（flex column）の :first-child = ParallaxViewer container
+ * のみが in-flow（PiP / overlay / FpsCounter は absolute）。 そこに max-height を効かせれば
+ * 親 .dp-viewer__canvas の自然高さも追従して縮み、 PiP の `bottom: 0.6rem` は sheet 直上に座る。
+ *
+ * **transition は付けない**:「reflow はスナップ完了時のみ」を守るため、
+ * sheet state 変化と同時にこの max-height は即座に切り替わり、 ResizeObserver は 1 回だけ発火する。
+ * BottomSheet 側の height は CSS transition で滑らかに動くが、 canvas reflow は瞬時。
+ */
+.dp-viewer--sheet[data-sheet-state='peek'] .dp-viewer__canvas > :first-child {
+  max-height: calc(100vh - var(--dp-sheet-peek-h) - var(--dp-sheet-chrome-h));
+}
+.dp-viewer--sheet[data-sheet-state='half'] .dp-viewer__canvas > :first-child {
+  max-height: calc(100vh - var(--dp-sheet-half-h) - var(--dp-sheet-chrome-h));
+}
+@supports (height: 100svh) {
+  .dp-viewer--sheet[data-sheet-state='peek'] .dp-viewer__canvas > :first-child {
+    max-height: calc(100svh - var(--dp-sheet-peek-h) - var(--dp-sheet-chrome-h));
+  }
+  .dp-viewer--sheet[data-sheet-state='half'] .dp-viewer__canvas > :first-child {
+    max-height: calc(100svh - var(--dp-sheet-half-h) - var(--dp-sheet-chrome-h));
+  }
+}
+
+.dp-bottom-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  background: #14141a;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+  box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.5);
+  color: #cfd6e0;
+  pointer-events: auto;
+  /* viewport-fit=cover でシート下端が画面端（ホームインジケータ下）まで広がるため、
+     インジケータぶんの余白を確保し peek の操作要素を被らせない。 高さも env ぶん伸ばして
+     可視コンテンツ領域は従来どおり保つ（下記 data-sheet-state の calc）。 */
+  padding-bottom: env(safe-area-inset-bottom);
+  transition: height var(--dp-sheet-transition-ms, 220ms) ease-out;
+  /* will-change で transform 追従のジャンクを減らす */
+  will-change: transform, height;
+}
+/*
+ * シート背景を下方向へ延長する擬似要素。
+ * drag 中はシート全体が transform: translateY(上) で持ち上がり、 下端と画面下の間に
+ * 隙間ができる。 その隙間から固定シート背後のページ（canvas 下端 + footer）が覗いて
+ * 違和感が出るため、 ::after をシート下端から下へ伸ばして同色で埋める
+ * （= シートが下端から生えて伸びているように見せる）。 通常時（bottom:0）は画面外。
+ */
+.dp-bottom-sheet::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  /* 速いスワイプで持ち上がり量が大きくても覆えるよう画面高ぶん確保（svh 主・vh フォールバック） */
+  height: 100vh;
+  height: 100svh;
+  background: #14141a; /* .dp-bottom-sheet の background と一致させる */
+  pointer-events: none;
+}
+.dp-bottom-sheet[data-sheet-state='peek'] {
+  height: calc(var(--dp-sheet-peek-h, 12vh) + env(safe-area-inset-bottom));
+}
+.dp-bottom-sheet[data-sheet-state='half'] {
+  height: calc(var(--dp-sheet-half-h, 55vh) + env(safe-area-inset-bottom));
+}
+/*
+ * ハンドル + Peek 全体を覆う drag 面。 縦 drag / tap でシート開閉。
+ * **この要素自体には touch-action: none を付けない**: range スライダーの祖先になるため、
+ * ここで none にすると横パンが死ぬ。 drag 占有は各リーフ（handle / header / slider-label /
+ * slider-value）に個別に付与する。
+ */
+.dp-bottom-sheet__grab {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  cursor: grab;
+  user-select: none;
+}
+.dp-bottom-sheet__grab:active {
+  cursor: grabbing;
+}
+.dp-bottom-sheet__handle {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* tap/swipe 起点を広げる（ヒット領域）。 Peek 全体も掴めるが視覚アフォーダンスとして確保 */
+  height: 22px;
+  /* drag 占有: ブラウザのデフォルトスクロールを抑制（range の祖先ではないので安全） */
+  touch-action: none;
+}
+.dp-bottom-sheet__handle-bar {
+  display: block;
+  width: 44px;
+  height: 5px;
+  border-radius: 2.5px;
+  background: rgba(255, 255, 255, 0.4);
+}
+.dp-bottom-sheet__peek {
+  flex: 0 0 auto;
+  padding: 0 0.75rem;
+}
+.dp-bottom-sheet__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0.5rem 0.75rem 1rem;
+  /* シート内スクロール許容（ページ全体ではなくシート内で吸収） */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+/* Peek ではシート本体は見えない（高さ計算上は存在するが overflow で切る） */
+.dp-bottom-sheet[data-sheet-state='peek'] .dp-bottom-sheet__body {
+  overflow: hidden;
+  visibility: hidden;
+  pointer-events: none;
+}
+/* Half では Peek 部（mini slider 行）を非表示に。 ViewModeTabs + EffectPanel と
+   モード/エフェクト名表示が重複するため。 */
+.dp-bottom-sheet[data-sheet-state='half'] .dp-bottom-sheet__peek {
+  display: none;
+}
+
+/* Peek 内の「モード + エフェクト名 + primary param ミニスライダー」。 */
+.dp-mini-primary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.1rem 0;
+  font-size: 0.85rem;
+}
+.dp-mini-primary__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 24px;
+  /* drag 占有リーフ（range の祖先ではないので none で安全）。 縦 drag でシート開閉 */
+  touch-action: none;
+}
+.dp-mini-primary__mode {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(120, 170, 255, 0.18);
+  border: 1px solid rgba(120, 170, 255, 0.4);
+  color: #dde7ff;
+  white-space: nowrap;
+}
+.dp-mini-primary__effect {
+  font-weight: 600;
+  color: #dde7ff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dp-mini-primary__play {
+  margin-left: auto;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.85rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.dp-mini-primary__slider {
+  display: grid;
+  grid-template-columns: minmax(64px, max-content) 1fr minmax(36px, max-content);
+  gap: 0.5rem;
+  align-items: center;
+}
+.dp-mini-primary__slider-label {
+  font-size: 0.75rem;
+  color: #9aa3b2;
+  white-space: nowrap;
+  /* drag 占有リーフ。 ラベル上の縦 drag でもシートを掴める */
+  touch-action: none;
+}
+.dp-mini-primary__slider input[type='range'] {
+  width: 100%;
+  margin: 0;
+  /* 横操作のみ許可。 祖先は touch-action: auto のままなので pan-x が有効。
+     縦 drag は無反応（背景ページへスクロールを漏らさない）*/
+  touch-action: pan-x;
+}
+.dp-mini-primary__slider-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+.dp-mini-primary__slider-tick {
+  position: absolute;
+  top: 50%;
+  width: 2px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.45);
+  border-radius: 1px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.dp-mini-primary__slider-value {
+  font-size: 0.75rem;
+  color: #cfd6e0;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  /* drag 占有リーフ。 数値表示上の縦 drag でもシートを掴める */
+  touch-action: none;
+}
+
+/*
+ * EffectPanel Lv2 (エフェクトタブ) 横スクロール用の細スクロールバー。
+ * inline style では ::-webkit-scrollbar を指定できないためグローバル CSS で。
+ */
+.dp-lv2-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+.dp-lv2-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 2px;
+}
+.dp-lv2-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/*
+ * Lv2 横スクロールの左右 chevron。inline style では :hover を扱えないため、
+ * ホバー時の強調はクラス指定。button のグローバル指定 (.dp-main button) も
+ * 受けてしまうので background / border をここで上書きする。
+ */
+.dp-lv2-chevron:hover:not(:disabled) {
+  background: rgba(40, 50, 70, 0.96);
+  border-color: rgba(120, 170, 255, 0.6);
+}
+.dp-lv2-chevron:focus-visible {
+  outline: 2px solid #6aa9ff;
+  outline-offset: 2px;
+}
+
+.dp-footer {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.8rem;
+  color: #9aa3b2;
+}
+
+@media (max-width: 768px) {
+  .dp-main {
+    padding: 1rem 0.75rem;
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-right: max(0.75rem, env(safe-area-inset-right));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    padding-left: max(0.75rem, env(safe-area-inset-left));
+    gap: 0.75rem;
+  }
+  /* row + flex-wrap のまま（base 継承）。 .dp-badges の margin-left:auto により、
+     1 行に収まればタイトル左 / バッジ右、 収まらなければバッジが 2 行目へ右寄せ折り返し。 */
+  .dp-header {
+    gap: 0.5rem;
+  }
+  .dp-header h1 {
+    font-size: 1.2rem;
+  }
+  .dp-inferring {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .dp-thumbnail {
+    width: 100%;
+    height: auto;
+    max-height: 50vw;
+  }
+  .dp-footer {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dp-main {
+    padding: 0.75rem 0.5rem;
+    padding-top: max(0.75rem, env(safe-area-inset-top));
+    padding-right: max(0.5rem, env(safe-area-inset-right));
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+    padding-left: max(0.5rem, env(safe-area-inset-left));
+  }
+  button {
+    padding: 0.45rem 0.7rem;
+  }
+}
