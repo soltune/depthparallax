@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef } from 'react';
 import type { SampleItem } from './Dropzone';
 import { useI18n } from '../i18n/LanguageProvider';
 
@@ -6,7 +6,8 @@ import { useI18n } from '../i18n/LanguageProvider';
  * 設定 UI 常駐版の画像セレクタ（全画面 Dropzone は初回のみ、以後の差替はここで完結）。
  * Dropzone のサブセット（D&D 装飾・大型ボタンなし）。disabled はモデルロード中/推論中に制御。
  * file input の onChange はキャンセルでは発火しないので既存 lastImageData / lastResult は壊れない。
- * collapseKey 変化（= 推論完了で lastResult 更新）で自動 collapse。collapsed は「画像 ▾」の 1 行帯。
+ * 設定パネル最下部に常駐するため折り畳みは持たず常時展開。見出しテキストはサムネ + ファイル選択
+ * ボタンで用途が自明なので省略し、支援技術向けに section の aria-label だけ残す。
  */
 interface ImagePickerProps {
   samples: SampleItem[];
@@ -15,10 +16,6 @@ interface ImagePickerProps {
   disabled?: boolean;
   /** モバイル時にカメラ起動 input を出す（既存 Dropzone と同じ振る舞い） */
   enableCameraCapture?: boolean;
-  /** 変化したら自動で折り畳む（通常は最新の DepthResult を渡し推論完了で collapse）。 */
-  collapseKey?: unknown;
-  /** collapsed バーのサムネ URL（サンプルはサムネ path、アップロードは dataURL）。 */
-  currentThumbnailUrl?: string | null;
 }
 
 function isImageFile(file: File): boolean {
@@ -32,21 +29,10 @@ export function ImagePicker({
   onSelectSample,
   disabled = false,
   enableCameraCapture = false,
-  collapseKey,
-  currentThumbnailUrl,
 }: ImagePickerProps) {
   const { t } = useI18n();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const cameraInputRef = useRef<HTMLInputElement | null>(null);
-  const [collapsed, setCollapsed] = useState(true);
-  const prevCollapseKeyRef = useRef(collapseKey);
-
-  useEffect(() => {
-    if (prevCollapseKeyRef.current !== collapseKey) {
-      prevCollapseKeyRef.current = collapseKey;
-      setCollapsed(true);
-    }
-  }, [collapseKey]);
 
   const handleClickPick = useCallback(() => {
     if (disabled) return;
@@ -64,52 +50,8 @@ export function ImagePicker({
     [onSelectFile],
   );
 
-  if (collapsed) {
-    return (
-      <section className="dp-image-picker dp-image-picker--collapsed" aria-label={t.picker.sectionAria}>
-        <button
-          type="button"
-          className="dp-image-picker__toggle"
-          onClick={() => setCollapsed(false)}
-          aria-expanded={false}
-          aria-controls="dp-image-picker-body"
-        >
-          {currentThumbnailUrl && (
-            <img
-              src={currentThumbnailUrl}
-              alt=""
-              className="dp-image-picker__toggle-thumb"
-              decoding="async"
-            />
-          )}
-          <span className="dp-image-picker__toggle-label">{t.picker.change}</span>
-          <span className="dp-image-picker__toggle-chevron" aria-hidden="true">
-            ▾
-          </span>
-        </button>
-      </section>
-    );
-  }
-
   return (
-    <section
-      className="dp-image-picker dp-image-picker--expanded"
-      aria-label={t.picker.sectionAria}
-      id="dp-image-picker-body"
-    >
-      <div className="dp-image-picker__header">
-        <div className="dp-image-picker__label">{t.picker.selectAnother}</div>
-        <button
-          type="button"
-          className="dp-image-picker__collapse"
-          onClick={() => setCollapsed(true)}
-          aria-expanded={true}
-          aria-controls="dp-image-picker-body"
-          aria-label={t.picker.collapseAria}
-        >
-          ▴
-        </button>
-      </div>
+    <section className="dp-image-picker" aria-label={t.picker.sectionAria}>
       <div className="dp-image-picker__samples">
         {samples.map((s) => (
           <button

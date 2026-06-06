@@ -224,7 +224,8 @@ function resolvePrimary({
 
 /**
  * Peek の状態表示用エフェクト名（parallax → 'エフェクト未選択'）。EffectPanel の tabLabelFor は
- * 'エフェクトなし'（あちらは選べるタブなので別表記）。Peek と Half は CSS で排他なので表記が異なってよい。
+ * '標準'（あちらは選べるタブなので肯定形、こちらは状態表示なので「未選択」で探索を促す別表記）。
+ * Peek と Half は CSS で排他なので表記が異なってよい。
  */
 function displayNameFor(desc: EffectDescriptor, t: Dictionary): string {
   if (desc.type === 'parallax') return t.miniPrimary.noEffect;

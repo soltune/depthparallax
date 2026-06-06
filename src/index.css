@@ -447,11 +447,6 @@ input[type='range'] {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
 }
-.dp-image-picker__label {
-  font-size: 0.8rem;
-  color: #9aa3b2;
-  letter-spacing: 0.04em;
-}
 .dp-image-picker__samples {
   display: flex;
   gap: 0.4rem;
@@ -486,82 +481,6 @@ input[type='range'] {
 }
 .dp-image-picker__camera {
   font-size: 0.85rem;
-}
-
-/*
- * 折り畳み版 ImagePicker。
- * collapsed 時はセクション自体が薄い 1 行ボタン。expanded 時はヘッダ行に
- * ラベルと折り畳みボタンを並べる。
- */
-.dp-image-picker--collapsed {
-  padding: 0;
-  background: transparent;
-  border: none;
-}
-.dp-image-picker__toggle {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-  padding: 0.35rem 0.6rem 0.35rem 0.4rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  color: #cfd6e0;
-  cursor: pointer;
-  text-align: left;
-}
-.dp-image-picker__toggle-thumb {
-  display: block;
-  width: 36px;
-  height: 26px;
-  object-fit: cover;
-  border-radius: 3px;
-  background: #000;
-  flex-shrink: 0;
-}
-.dp-image-picker__toggle:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.18);
-}
-.dp-image-picker__toggle:focus-visible {
-  outline: 2px solid #6aa9ff;
-  outline-offset: 2px;
-}
-.dp-image-picker__toggle-label {
-  font-size: 0.8rem;
-  color: #9aa3b2;
-  letter-spacing: 0.04em;
-}
-.dp-image-picker__toggle-chevron {
-  font-size: 0.75rem;
-  color: #9aa3b2;
-  line-height: 1;
-  margin-left: auto;
-}
-
-.dp-image-picker__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.dp-image-picker__collapse {
-  background: transparent;
-  border: none;
-  color: #9aa3b2;
-  cursor: pointer;
-  padding: 0.1rem 0.3rem;
-  font-size: 0.85rem;
-  line-height: 1;
-  border-radius: 3px;
-}
-.dp-image-picker__collapse:hover {
-  color: #cfd6e0;
-  background: rgba(255, 255, 255, 0.06);
-}
-.dp-image-picker__collapse:focus-visible {
-  outline: 2px solid #6aa9ff;
-  outline-offset: 2px;
 }
 
 .dp-settings-pane {

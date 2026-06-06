@@ -17,8 +17,9 @@ type ParamMap = Record<string, ParamValue>;
 
 /**
  * 設定 UI 全体を束ねる presentational コンテナ（配置は App.tsx + index.css の dp-viewer--wide / --sheet が担う）。
- * 画像 → ビュー → エフェクトの順: ImagePicker（推論完了で auto collapse）/ ViewModeCard /
- * 視差ビュー時 EffectPanel（dolly 選択時は headerSlot に DollyPlayControl）/ 末尾に深度マップ表示・強調トグル。
+ * 上から「今の画像への操作」→ 末尾に「画像差し替え」の順:
+ * ViewModeCard / 視差ビュー時 EffectPanel（dolly 選択時は headerSlot に DollyPlayControl）/
+ * 深度マップ表示・強調トグル。 区切り線を挟んで最下部に ImagePicker（常時展開）。
  */
 export interface SettingsPaneProps {
   viewMode: ViewMode;
@@ -48,10 +49,6 @@ export interface SettingsPaneProps {
   onSelectSample: (path: string) => void;
   imagePickerDisabled?: boolean;
   enableCameraCapture?: boolean;
-  /** ImagePicker の auto-collapse トリガ。 通常は lastResult を渡す */
-  imagePickerCollapseKey?: unknown;
-  /** collapsed バーに表示する現在画像のサムネ URL */
-  currentThumbnailUrl?: string | null;
 
   orbitParams: ParamMap;
   onOrbitParamsChange: (params: ParamMap) => void;
@@ -106,8 +103,6 @@ export function SettingsPane({
   onSelectSample,
   imagePickerDisabled,
   enableCameraCapture,
-  imagePickerCollapseKey,
-  currentThumbnailUrl,
   orbitParams,
   onOrbitParamsChange,
   isDollyPlaying,
@@ -127,15 +122,6 @@ export function SettingsPane({
   const isFilterFocalEffect = currentEffect === 'dof' || currentEffect === 'tiltshift';
   return (
     <div className="dp-settings-pane">
-      <ImagePicker
-        samples={samples}
-        onSelectFile={onSelectFile}
-        onSelectSample={onSelectSample}
-        disabled={imagePickerDisabled}
-        enableCameraCapture={enableCameraCapture}
-        collapseKey={imagePickerCollapseKey}
-        currentThumbnailUrl={currentThumbnailUrl}
-      />
       <ViewModeCard
         viewMode={viewMode}
         onViewModeChange={onViewModeChange}
@@ -197,9 +183,7 @@ export function SettingsPane({
           display: 'flex',
           flexDirection: 'column',
           gap: '0.35rem',
-          padding: '0.5rem 0.25rem 0',
-          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-          marginTop: '0.25rem',
+          padding: '0 0.25rem',
         }}
       >
         <label
@@ -235,6 +219,20 @@ export function SettingsPane({
           />
           {t.depthMap.enhanceToggle}
         </label>
+      </div>
+      <div
+        style={{
+          paddingTop: '1rem',
+          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+        }}
+      >
+        <ImagePicker
+          samples={samples}
+          onSelectFile={onSelectFile}
+          onSelectSample={onSelectSample}
+          disabled={imagePickerDisabled}
+          enableCameraCapture={enableCameraCapture}
+        />
       </div>
     </div>
   );

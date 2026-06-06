@@ -34,9 +34,6 @@ export const ja: Dictionary = {
   },
   picker: {
     sectionAria: '画像',
-    change: '画像を変更',
-    selectAnother: '別の画像を選ぶ',
-    collapseAria: '画像セクションを折り畳む',
     fromFile: 'ファイルから選択',
     capture: '📷 撮影',
   },
@@ -44,7 +41,7 @@ export const ja: Dictionary = {
     groupFilter: 'フィルター',
     groupMotion: '動き・演出',
     groupsAria: 'エフェクトグループ',
-    noEffect: 'エフェクトなし',
+    noEffect: '標準',
     scrollLeft: '左にスクロール',
     scrollRight: '右にスクロール',
     noParams: '調整できる項目はありません',

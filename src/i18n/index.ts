@@ -59,9 +59,6 @@ export interface Dictionary {
   };
   picker: {
     sectionAria: string;
-    change: string;
-    selectAnother: string;
-    collapseAria: string;
     fromFile: string;
     capture: string;
   };

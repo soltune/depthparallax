@@ -85,7 +85,7 @@ export function EffectPanel({
   const { t } = useI18n();
   const groupLabel = (group: EffectGroup) =>
     group === 'filter' ? t.effectPanel.groupFilter : t.effectPanel.groupMotion;
-  // タブラベル。parallax だけタブ上では「エフェクトなし」と読み替える（内部識別子はそのまま）。
+  // タブラベル。parallax だけタブ上では「標準」と読み替える（内部識別子はそのまま）。
   const tabLabelFor = (desc: EffectDescriptor) =>
     desc.type === 'parallax' ? t.effectPanel.noEffect : desc.displayName;
 
@@ -127,12 +127,8 @@ export function EffectPanel({
   }, [currentDesc]);
 
   // activeGroup / currentEffect 変化時にアクティブな Lv2 タブを横スクロール内へ寄せる ref。
+  // 横寄せ本体は lv2ScrollRef 宣言後の useEffect（下記参照）。
   const activeTabRef = useRef<HTMLButtonElement | null>(null);
-  useEffect(() => {
-    const el = activeTabRef.current;
-    if (!el) return;
-    el.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'smooth' });
-  }, [activeGroup, currentEffect]);
 
   // Lv2 横スクロールの overflow 検出。右端 gradient だけでは押せると伝わらないため、overflow がある側に
   // chevron ボタンを出す（マウスで右端タブに辿り着けない問題への対策）。
@@ -170,6 +166,22 @@ export function EffectPanel({
       behavior: 'smooth',
     });
   }, []);
+
+  // activeGroup / currentEffect 変化時、アクティブな Lv2 タブを Lv2 横スクロール内へ寄せる。
+  // scrollIntoView は軸を選べず block:'nearest' が縦の最寄りスクロール祖先（モバイルの
+  // BottomSheet body / PC 右ペイン）まで動かしてしまう（折りたたみ中に縦スクロールが漏れ、
+  // 展開時に最下部表示になる不具合の原因となる）。横方向だけ scrollBy で寄せる（inline:'nearest' 相当）。
+  useEffect(() => {
+    const scroller = lv2ScrollRef.current;
+    const tab = activeTabRef.current;
+    if (!scroller || !tab) return;
+    const scRect = scroller.getBoundingClientRect();
+    const tabRect = tab.getBoundingClientRect();
+    let dx = 0;
+    if (tabRect.left < scRect.left) dx = tabRect.left - scRect.left;
+    else if (tabRect.right > scRect.right) dx = tabRect.right - scRect.right;
+    if (dx !== 0) scroller.scrollBy({ left: dx, behavior: 'smooth' });
+  }, [activeGroup, currentEffect]);
 
   const handleGroupTabClick = useCallback(
     (group: EffectGroup) => {

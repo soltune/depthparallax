@@ -116,30 +116,6 @@ async function loadImage(src: string): Promise<HTMLImageElement> {
   return img;
 }
 
-/** ImagePicker collapsed バー用サムネ生成。object URL の revoke 問題を避け dataURL に固める（cover 中央クロップ）。 */
-function makeThumbnailDataURL(img: HTMLImageElement, w = 96, h = 64): string {
-  const canvas = document.createElement('canvas');
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return '';
-  const srcAspect = img.naturalWidth / img.naturalHeight;
-  const dstAspect = w / h;
-  let sw = img.naturalWidth;
-  let sh = img.naturalHeight;
-  let sx = 0;
-  let sy = 0;
-  if (srcAspect > dstAspect) {
-    sw = sh * dstAspect;
-    sx = (img.naturalWidth - sw) / 2;
-  } else {
-    sh = sw / dstAspect;
-    sy = (img.naturalHeight - sh) / 2;
-  }
-  ctx.drawImage(img, sx, sy, sw, sh, 0, 0, w, h);
-  return canvas.toDataURL('image/jpeg', 0.75);
-}
-
 function App() {
   const { t, format } = useI18n();
   const objectUrlRef = useRef<string | null>(null);
@@ -160,7 +136,6 @@ function App() {
   const [lastImageSrc, setLastImageSrc] = useState<string | null>(null);
   const [lastImageData, setLastImageData] = useState<ImageData | null>(null);
   // 現在画像のサムネ（dataURL）。サンプルは SAMPLE_DEFS[].thumbnail、ファイルは loadImage 後に生成。
-  const [currentThumbnailUrl, setCurrentThumbnailUrl] = useState<string | null>(null);
   // サンプル画像は数 MB あり fetch + decode に数秒かかる。無反応に見えないよう loadImage 前後で立てる。
   const [imageLoading, setImageLoading] = useState(false);
   const [parallaxConfig, setParallaxConfig] = useState<ParallaxConfig>(DEFAULT_PARALLAX_CONFIG);
@@ -572,7 +547,6 @@ function App() {
       setImageLoading(true);
       try {
         const img = await loadImage(url);
-        setCurrentThumbnailUrl(makeThumbnailDataURL(img));
         await startInference(img, url);
       } catch (e) {
         console.error('[App] failed to load file', e);
@@ -588,10 +562,6 @@ function App() {
       setImageLoading(true);
       try {
         const url = `${import.meta.env.BASE_URL}${samplePath}`;
-        const sample = SAMPLE_DEFS.find((s) => s.path === samplePath);
-        if (sample?.thumbnail) {
-          setCurrentThumbnailUrl(`${import.meta.env.BASE_URL}${sample.thumbnail}`);
-        }
         const img = await loadImage(url);
         await startInference(img, url);
       } catch (e) {
@@ -673,8 +643,6 @@ function App() {
       onSelectSample={handleSelectSample}
       imagePickerDisabled={dropzoneDisabled}
       enableCameraCapture={isMobile}
-      imagePickerCollapseKey={lastResult}
-      currentThumbnailUrl={currentThumbnailUrl}
       orbitParams={orbitParams}
       onOrbitParamsChange={handleOrbitParamsChange}
       isDollyPlaying={isDollyPlaying}

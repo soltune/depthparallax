@@ -34,9 +34,6 @@ export const en: Dictionary = {
   },
   picker: {
     sectionAria: 'Image',
-    change: 'Change image',
-    selectAnother: 'Choose another image',
-    collapseAria: 'Collapse image section',
     fromFile: 'Select file',
     capture: '📷 Camera',
   },
@@ -44,7 +41,7 @@ export const en: Dictionary = {
     groupFilter: 'Filters',
     groupMotion: 'Motion',
     groupsAria: 'Effect groups',
-    noEffect: 'No effect',
+    noEffect: 'Normal',
     scrollLeft: 'Scroll left',
     scrollRight: 'Scroll right',
     noParams: 'No adjustable parameters',
